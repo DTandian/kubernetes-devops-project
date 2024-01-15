@@ -3,12 +3,16 @@ kind: Ingress
 metadata:
   name: fastapi-ingress
   namespace: standard
-  # annotations:
-  #   traefik.ingress.kubernetes.io/router.entrypoints: web
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
 spec:
   ingressClassName: traefik
+  tls:
+    - secretName: fastapi-secret
+      hosts: 
+        - microservice-kube.cours-devops.cloudns.ph
   rules:
-  - host: fastapi.minikube.local
+  - host: microservice-kube.cours-devops.cloudns.ph
     http:
       paths:
       - path: /
