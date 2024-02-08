@@ -22,12 +22,12 @@ spec:
         imagePullPolicy: "Always"
         ports: 
         - containerPort: 5000
-          hostPort: 80  # Explanation comment removed due to ambiguity
+          #hostPort: 80  # Explanation comment removed due to ambiguity
           name: fastapi-svc
           protocol: TCP
         resources:
           requests:
-            cpu: "70m"
+            cpu: "100m"
 ---
 apiVersion: v1
 kind: Service
