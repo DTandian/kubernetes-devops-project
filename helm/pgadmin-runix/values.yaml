@@ -63,9 +63,9 @@ serverDefinitions:
 
 service:
   type: ClusterIP
-  port: 80
-  targetPort: 80
-  portName: http
+  port: 8080
+  targetPort: 8080
+  portName: pgadmin-fastapi
 
 ingress:
   enabled: false
