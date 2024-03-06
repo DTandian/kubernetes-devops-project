@@ -3,7 +3,7 @@
 # Declare variables to be passed into your templates.
 
 replicaCount: 1
-
+name: pgadmin
 image:
   repository: dpage/pgadmin4
   pullPolicy: IfNotPresent
@@ -26,7 +26,8 @@ serviceAccount:
   name: ""
 
 podAnnotations: {}
-podLabels: {}
+podLabels: 
+  app: frontend 
 
 podSecurityContext: {}
   # fsGroup: 2000
@@ -49,39 +50,53 @@ serverDefinitions:
   resourceType: ConfigMap
 
   servers:
-   firstServer:
-     Name: "postgreServer"
-     Group: "Servers"
-     Port: 5432
-     Username: "postgres"
-     Host: "localhost"
-     SSLMode: "prefer"
-     MaintenanceDB: "postgresDB"
+    firstServer:
+      Name: "postgreServer"
+      Group: "Servers"
+      Port: 5432
+      Username: "postgres"
+      Host: "localhost"
+      SSLMode: "prefer"
+      MaintenanceDB: "postgresDB"
 
 # networkPolicy:
 #   enabled: true
 
 service:
   type: ClusterIP
-  port: 8080
-  targetPort: 8080
-  portName: pgadmin-fastapi
+  selector: frontend
+  name: fastapi-pgadmin
+  port: 8088
+  protocol: TCP
+  targetPort: 80
+  #portName: pgadmin-fastapi
+
 
 ingress:
-  enabled: false
-  className: ""
-  annotations: {}
-    # kubernetes.io/ingress.class: nginx
-    # kubernetes.io/tls-acme: "true"
-  hosts:
-    - host: chart-example.local
-      paths:
-        - path: /
-          pathType: ImplementationSpecific
-  tls: []
-  #  - secretName: chart-example-tls
-  #    hosts:
-  #      - chart-example.local
+  enabled: true
+  name: "pgadmin-ingress"
+  className: "traefik"
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+  spec:
+    ingressClassname: traefik
+    rules:
+      - host: microservice-k8s.cours-devops.cloudns.ph
+        http:
+          paths:
+            - path:
+              pathType: Prefix  # Specify the pathType
+              backend:
+                service:
+                  name: pgadmin
+                  port:
+                    number: 8080
+
+  tls:
+    - secretName: fastapi-secret
+      hosts:
+        - microservice-k8s.cours-devops.cloudns.ph
+
 
 resources: {}
   # We usually recommend not to specify default resources and to leave this as a conscious
